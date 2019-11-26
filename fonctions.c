@@ -31,7 +31,7 @@ Liste *creation()
 //---------------------------------------------------------------------------------------------------
 
 
-//Tristan Aléatoire//
+//Partie Aléatoire//
 
 
 float frand_a_b(float a, float b){
