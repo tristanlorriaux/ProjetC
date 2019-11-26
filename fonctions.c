@@ -122,5 +122,22 @@ void ajout_voiture(float timer,Liste *liste, float tab_aleatoire[N]){
     }
 }
 
+float timer_reduit(float timer)// permet de travailler toujours dans l'intervalle du début
+{
+    float new_timer;
+    while (timer>T)
+        new_timer = timer-T;
+    return new_timer;
+}
+
+void simulation(float temps_simul){
+    Liste *File_voitures=creation();
+    float timer=0;
+    while (timer<temps_simul){
+        if (timer< && timer>)
+    }
+
+}
+
 
 //----------------------------------------------------------------------------------------------------------------
