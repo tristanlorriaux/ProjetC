@@ -105,19 +105,20 @@ int indice_tab(float *tab[N]){
 
 
 void ajout_voiture(float timer,Liste *liste, float tab_aleatoire[N]){
-    int i = indice_tab(&tab_aleatoire);
-    double tps = tab_aleatoire[i];
+    int i = indice_tab(&tab_aleatoire);             //indice du premier temps valide de la liste
+    double tps = tab_aleatoire[i];                  //prochain temps aléatoire
     Element *nouveau = malloc(sizeof(*nouveau));
     Element *courant = malloc(sizeof(*nouveau));
     courant = liste->premier;
     while (courant->suiv != NULL)
         courant = courant->suiv;
-    float der_tps = courant->voiture.ha;
-    while((float)tps + der_tps < timer ){
-        insertion(liste, (float)tps + der_tps);
-        tab_aleatoire[i] = 0;
-        i++;
-        tps = tab_aleatoire[i];
+    float der_tps = courant->voiture.ha;            //temps d'arrivée de la dernière voiture
+    while((float)tps + der_tps < timer ){           //On insère toutes les voiture qui sont arrivées avantle timer tps + der_tps = ha dernière voiture
+        insertion(liste, (float)tps + der_tps);     //INsertion de la voiture
+        tab_aleatoire[i] = 0;                       //On supprive le temps d'arrivée de la voiture inseré pour se repérer dans la liste
+        i++;                                        //INdice du prochain temps potentiel à ajouté
+        der_tps+=(float)tps                         //Heure d'arrivée de la nouvelle voiture ajouté
+        tps = tab_aleatoire[i];                     //temps d'arrivée de la prochaine voiture
     }
 }
 
