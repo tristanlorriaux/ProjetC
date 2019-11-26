@@ -118,6 +118,9 @@ void ajout_voiture(float timer,Liste *liste, float tab_aleatoire[N]){   //Ajoute
     courant = liste->premier;
     while (courant->suiv != NULL)
         courant = courant->suiv;
+    if (tab_aleatoire[-1] == 0){                    //SI le tableau est vide on en recalcule un nouveau
+                creation_tab_aleatoire(tab_aleatoire);
+            }
     float der_tps = courant->voiture.ha;            //temps d'arrivée de la dernière voiture
     while((float)tps + der_tps < timer ){           //On insère toutes les voiture qui sont arrivées avantle timer tps + der_tps = ha dernière voiture
         insertion(liste, (float)tps + der_tps);     //INsertion de la voiture
@@ -146,10 +149,7 @@ void simulation(float temps_simul){
         
         while (timer_reduit(timer) < Tv-alpha && timer_reduit(timer) > 0 && timer < temps_simul){   //Phase 1 : Feu vert
             avancer(File_voitures);
-            timer+=alpha;
-            if (tab_aleatoire[-1] == 0){    //SI le tableau est vide on en recalcule un nouveau
-                creation_tab_aleatoire(tab_aleatoire);
-            }
+            timer+=alpha;            
             ajout_voiture(timer,File_voitures,tab_aleatoire);
         }              
         
@@ -163,16 +163,11 @@ void simulation(float temps_simul){
         
         
         while(timer_reduit(timer) >= Tv  && timer_reduit(timer) <= T && timer < temps_simul)    //Phase 3 : Feu rouge            
-            if (tab_aleatoire[-1] == 0){    //SI le tableau est vide on en recalcule un nouveau
-                creation_tab_aleatoire(tab_aleatoire);
-            }
+            
             ajout_voiture(timer,File_voitures,tab_aleatoire);
         
             timer +=  T - timer_reduit(timer);                      //On ajoute avant et après la mise à jour
                                                                     // du timer en prévention d'un cas particulier un peu chiant, si alpha est tel que l'on saute la phase 2
-            if (tab_aleatoire[-1] == 0){    //SI le tableau est vide on en recalcule un nouveau
-                creation_tab_aleatoire(tab_aleatoire);
-            }
             ajout_voiture(timer,File_voitures,tab_aleatoire);
     }
 
