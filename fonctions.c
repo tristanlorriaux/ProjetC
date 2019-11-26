@@ -44,6 +44,12 @@ double temps_intermediaire(float lambda, float a, float b){
     return X;
 }
 
+void creation_tab_aleatoire(double *tab_aleatoire[N]){
+    for(int i = 0; i<N; i++){
+        tab_aleatoire[i] = temps_intermediaire(lambda, 0.0, 1.0)
+    }
+}
+
 
 
 //---------------------------------------------------------------------------------------------------
@@ -84,7 +90,7 @@ void insertion(Liste *liste, float ha) //Insère une voiture à la fin de la fil
 
 
 
-void avance(Liste *liste){ // Fais avancer la filed'attente de une place (La tête point dorénavant sur la deuxième voiture)
+void avancer(Liste *liste){ // Fais avancer la filed'attente de une place (La tête point dorénavant sur la deuxième voiture)
     Element *courant;
     courant = liste->premier;
     courant = courant->suiv;
@@ -133,8 +139,18 @@ float timer_reduit(float timer)// permet de travailler toujours dans l'intervall
 void simulation(float temps_simul){
     Liste *File_voitures=creation();
     float timer=0;
+    float tab_aleatoire[N];
+    creation_tab_aleatoire(tab_aleatoire);
     while (timer<temps_simul){
-        if (timer< && timer>)
+        int t_reduit = timer_reduit(temps_simulation);
+        while (t_reduit<Tv-alpha && t_reduit>0 && timer<temps_simul){
+               avancer(File_voitures);
+            timer+=alpha;
+            ajout_voiture(timer,File_voitures,tab_aleatoire);
+        }
+        while (t_reduit>=Tv-alpha && t_reduit<= T && timer<temps_simul){
+            timer =  
+        }
     }
 
 }
