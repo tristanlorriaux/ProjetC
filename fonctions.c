@@ -155,9 +155,9 @@ void simulation(float temps_simul){
         
         
         
-        while (timer_reduit(timer) >= Tv - alpha && timer_reduit(timer) <= Tv && timer < temps_simul){    //Phase 2 : Moment où le feu est vert mais les voitures n'auront pas le temps de passer le feu
-            timer +=  Tv - timer_reduit(timer)  //On ajoute l'écart entre le temps Tv (passage au rouge) et le timer modulo T
-            ajout_voiture(timer,File_voitures,tab_aleatoire);
+        while (timer_reduit(timer) >= Tv - alpha && timer_reduit(timer) <= Tv && timer < temps_simul){    //Phase 2 : Moment où le feu 
+            timer +=  Tv - timer_reduit(timer)                 //On ajoute l'écart entre le temps Tv      //est vert mais les voitures n'auront pas le temps de passer le feu
+            ajout_voiture(timer,File_voitures,tab_aleatoire);  //(passage au rouge) et le timer modulo T
         }
         
         
@@ -168,8 +168,8 @@ void simulation(float temps_simul){
             }
             ajout_voiture(timer,File_voitures,tab_aleatoire);
         
-            timer +=  T - timer_reduit(timer);                      //On ajoute avant et après la mise à jour du timer en prévention d'un cas particulier un peu chiant, si alpha est tel que l'on saute la phase 2
-        
+            timer +=  T - timer_reduit(timer);                      //On ajoute avant et après la mise à jour
+                                                                    // du timer en prévention d'un cas particulier un peu chiant, si alpha est tel que l'on saute la phase 2
             if (tab_aleatoire[-1] == 0){    //SI le tableau est vide on en recalcule un nouveau
                 creation_tab_aleatoire(tab_aleatoire);
             }
