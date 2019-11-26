@@ -1,3 +1,7 @@
+#include "fonctions.h"
+
+
+
 // PARTIE initialisation
 Liste *creation()
 {
@@ -27,29 +31,34 @@ Liste *creation()
 //---------------------------------------------------------------------------------------------------
 
 
-// PARTIE aléatoire
-double rand01(){
+//Tristan Aléatoire//
 
-    return ((float)rand ()) / RAND_MAX ;
+
+float frand_a_b(float a, float b){
+    return ( rand()/(double)RAND_MAX ) * (b-a) + a;
 }
 
-double tps_inter(){
-    double U = rand01();
+double temps_intermediaire(float lambda, float a, float b){
+    float U = frand_a_b(a, b);
+    printf ("<<%f>> \n\n",U);
     double X = -log(1 - U )/lambda;
-    return X;
 }
 
-float generateur_tab(float tab[N]){
-    for(int i = 0; i < N; i++ ){
-        tab[i] = (float)tps_inter();
-        i++;
-    }
-    return *tab;
-}
+
 
 //---------------------------------------------------------------------------------------------------
 
 // Partie utilitaire
+
+
+int convertisseur (int s)//Covertisseur secondes -> heures
+{
+int m,h,rs;
+h=s/3600;
+m=s%60;
+rs=s%60;
+return h,m,rs;
+}
 
 
 
