@@ -40,8 +40,8 @@ float frand_a_b(float a, float b){
 
 double temps_intermediaire(float lambda, float a, float b){
     float U = frand_a_b(a, b);
-    printf ("<<%f>> \n\n",U);
     double X = -log(1 - U )/lambda;
+    return X;
 }
 
 
