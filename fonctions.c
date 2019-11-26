@@ -100,7 +100,7 @@ void avancer(Liste *liste){ // Fais avancer la filed'attente de une place (La t�
 
 
 
-int indice_tab(float *tab[N]){
+int indice_tab(float *tab[N]){  //Donne l'indice du premier élément qui n'est pas un 0 de la liste
     int i = 0;
     while(tab[i] == 0){
         i++;
@@ -110,7 +110,7 @@ int indice_tab(float *tab[N]){
 
 
 
-void ajout_voiture(float timer,Liste *liste, float tab_aleatoire[N]){
+void ajout_voiture(float timer,Liste *liste, float tab_aleatoire[N]){   //Ajoute toutes les voitures qui n'ont pas étaient ajoutés jusqu'à timer
     int i = indice_tab(&tab_aleatoire);             //indice du premier temps valide de la liste
     double tps = tab_aleatoire[i];                  //prochain temps aléatoire
     Element *nouveau = malloc(sizeof(*nouveau));
@@ -141,19 +141,50 @@ void simulation(float temps_simul){
     float timer=0;
     float tab_aleatoire[N];
     creation_tab_aleatoire(tab_aleatoire);
-    while (timer<temps_simul){
-        int t_reduit = timer_reduit(temps_simulation);
-        while (t_reduit<Tv-alpha && t_reduit>0 && timer<temps_simul){
-               avancer(File_voitures);
+    while (timer<temps_simul){        
+        
+        
+        while (timer_reduit(timer) < Tv-alpha && timer_reduit(timer) > 0 && timer < temps_simul){   //Phase 1 : Feu vert
+            avancer(File_voitures);
             timer+=alpha;
+            if (tab_aleatoire[-1] == 0){    //SI le tableau est vide on en recalcule un nouveau
+                creation_tab_aleatoire(tab_aleatoire);
+            }
+            ajout_voiture(timer,File_voitures,tab_aleatoire);
+        }              
+        
+        
+        
+        while (timer_reduit(timer) >= Tv - alpha && timer_reduit(timer) <= Tv && timer < temps_simul){    //Phase 2 : Moment où le feu est vert mais les voitures n'auront pas le temps de passer le feu
+            timer +=  Tv - timer_reduit(timer)  //On ajoute l'écart entre le temps Tv (passage au rouge) et le timer modulo T
             ajout_voiture(timer,File_voitures,tab_aleatoire);
         }
-        while (t_reduit>=Tv-alpha && t_reduit<= T && timer<temps_simul){
-            timer =  
-        }
+        
+        
+        
+        while(timer_reduit(timer) >= Tv  && timer_reduit(timer) <= T && timer < temps_simul)    //Phase 3 : Feu rouge            
+            if (tab_aleatoire[-1] == 0){    //SI le tableau est vide on en recalcule un nouveau
+                creation_tab_aleatoire(tab_aleatoire);
+            }
+            ajout_voiture(timer,File_voitures,tab_aleatoire);
+        
+            timer +=  T - timer_reduit(timer);                      //On ajoute avant et après la mise à jour du timer en prévention d'un cas particulier un peu chiant, si alpha est tel que l'on saute la phase 2
+        
+            if (tab_aleatoire[-1] == 0){    //SI le tableau est vide on en recalcule un nouveau
+                creation_tab_aleatoire(tab_aleatoire);
+            }
+            ajout_voiture(timer,File_voitures,tab_aleatoire);
     }
 
 }
+
+
+
+
+
+
+
+
 
 
 //----------------------------------------------------------------------------------------------------------------
