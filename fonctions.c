@@ -144,33 +144,38 @@ void simulation(float temps_simul){
     float timer=0;
     float tab_aleatoire[N];
     creation_tab_aleatoire(tab_aleatoire);
+    float timer_red = timer_reduit(timer);
     while (timer<temps_simul){        
         
+        timer_red = timer_reduit(timer);
         
-        while (timer_reduit(timer) < Tv-alpha && timer_reduit(timer) > 0 && timer < temps_simul){   //Phase 1 : Feu vert
+        while (timer_red < Tv-alpha && timer_red > 0 && timer < temps_simul){   //Phase 1 : Feu vert
             avancer(File_voitures);
             timer+=alpha;            
             ajout_voiture(timer,File_voitures,tab_aleatoire);
+            timer_red = timer_reduit(timer);
         }              
         
         
-        
-        while (timer_reduit(timer) >= Tv - alpha && timer_reduit(timer) <= Tv && timer < temps_simul){    //Phase 2 : Moment où le feu 
-            timer +=  Tv - timer_reduit(timer)                 //On ajoute l'écart entre le temps Tv      //est vert mais les voitures n'auront pas le temps de passer le feu
+        timer_red = timer_reduit(timer);
+        while (timer_red >= Tv - alpha && timer_red <= Tv && timer < temps_simul){                          //Phase 2 : Moment où le feu 
+            timer +=  Tv - timer_red                            //On ajoute l'écart entre le temps Tv       //est vert mais les voitures n'auront pas le temps de passer le feu
             ajout_voiture(timer,File_voitures,tab_aleatoire);  //(passage au rouge) et le timer modulo T
+            timer_red = timer_reduit(timer);
         }
         
         
-        
-        while(timer_reduit(timer) >= Tv  && timer_reduit(timer) <= T && timer < temps_simul)    //Phase 3 : Feu rouge            
+        timer_red = timer_reduit(timer);
+        while(timer_red >= Tv  && timer_red <= T && timer < temps_simul)    //Phase 3 : Feu rouge            
             
             ajout_voiture(timer,File_voitures,tab_aleatoire);
         
-            timer +=  T - timer_reduit(timer);                      //On ajoute avant et après la mise à jour
+            timer +=  T - timer_red;                                //On ajoute avant et après la mise à jour
                                                                     // du timer en prévention d'un cas particulier un peu chiant, si alpha est tel que l'on saute la phase 2
             ajout_voiture(timer,File_voitures,tab_aleatoire);
+            timer_red = timer_reduit(timer);
     }
-
+   
 }
 
 
