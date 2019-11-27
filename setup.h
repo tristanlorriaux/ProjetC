@@ -21,6 +21,7 @@
  */
 
 typedef struct{
+    int indice;
     float ha;
     float t_att;
     float t_passage;
