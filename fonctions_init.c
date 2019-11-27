@@ -1,5 +1,5 @@
 #include "fonctions_init.h"
-
+#include "setup.h"
 
 
 // PARTIE initialisation
