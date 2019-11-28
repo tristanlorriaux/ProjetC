@@ -191,7 +191,7 @@ float timer_reduit(float timer)// permet de travailler toujours dans l'intervall
 {
     float new_timer = timer;
     while (new_timer > T)
-        new_timer = timer-T;
+        new_timer -= T;
     return new_timer;
 }
 
