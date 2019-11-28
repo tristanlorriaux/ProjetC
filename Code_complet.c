@@ -214,26 +214,26 @@ void simulation(float temps_simul){
         }
 
 
-        timer_red = timer_reduit(timer);
+        /*timer_red = timer_reduit(timer);
         while (timer_red >= Tv - alpha && timer_red <= Tv && timer < temps_simul){                          //Phase 2 : Moment où le feu
             timer +=  Tv - timer_red        ;                    //On ajoute l'écart entre le temps Tv       //est vert mais les voitures n'auront pas le temps de passer le feu
             ajout_voiture(timer,File_voitures,tab_aleatoire);  //(passage au rouge) et le timer modulo T
             timer_red = timer_reduit(timer);
             afficher_liste(File_voitures);
-        }
+        }*/
 
 
         timer_red = timer_reduit(timer);
-        while(timer_red >= Tv  && timer_red <= T && timer < temps_simul)    //Phase 3 : Feu rouge
+        while(timer_red >= Tv - alpha  && timer_red <= T && timer < temps_simul){    //Phase 3 : Feu rouge
 
             ajout_voiture(timer,File_voitures,tab_aleatoire);
 
-        timer +=  T - timer_red;                                //On ajoute avant et après la mise à jour
+            timer +=  T - timer_red;                                //On ajoute avant et après la mise à jour
                                                                 // du timer en prévention d'un cas particulier un peu chiant, si alpha est tel que l'on saute la phase 2
-        ajout_voiture(timer,File_voitures,tab_aleatoire);
-        timer_red = timer_reduit(timer);
-        afficher_liste(File_voitures);
-    }
+            ajout_voiture(timer,File_voitures,tab_aleatoire);
+            timer_red = timer_reduit(timer);
+            afficher_liste(File_voitures);
+        }
     //afficher_liste(File_voitures);
 
 }
