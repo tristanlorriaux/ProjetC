@@ -7,11 +7,11 @@
 
 
 
-#define lambda 0.1
+#define lambda 0.25
 #define alpha 3
-#define T 10   // période cycle
-#define Tv 6   // période feu vert
-#define N 10
+#define T 15   // période cycle
+#define Tv 10   // période feu vert
+#define N 100
 
 
 // partie init----------------------------------------------------------------------------------------------------------
@@ -139,18 +139,16 @@ void insertion(Liste *liste, float ha) //Insère une voiture à la fin de la fil
 }
 
 
-//OK sauf pour liste vide
+//OK
 void avancer(Liste *liste){ // Fais avancer la filed'attente de une place (La tête point dorénavant sur la deuxième voiture)
-
-    if(liste->premier == NULL){
-        exit(EXIT_FAILURE);
+    Element *nouveau = liste->premier;
+    if(nouveau->suiv == NULL) {
+         liste = creation();
     }
-    else{
-        Element *courant;
-        courant = liste->premier;
-        courant = courant->suiv;
-        liste->premier = courant;
-    }
+    Element *courant;
+    courant = liste->premier;
+    courant = courant->suiv;
+    liste->premier = courant;
 }
 
 
@@ -178,16 +176,14 @@ void ajout_voiture(float timer,Liste *liste, double tab_aleatoire[N]){   //Ajout
     courant = liste->premier;
     while (courant->suiv != NULL)
         courant = courant->suiv;
-
     float der_tps = courant->voiture.ha;            //temps d'arrivée de la dernière voiture
     while((float)tps + der_tps < timer ){           //On insère toutes les voitures qui sont arrivées avant le timer avec  tps + der_tps = ha dernière voiture
-        insertion(liste, (float)tps + der_tps); //INsertion de la voiture
+        insertion(liste, (float)tps + der_tps); //Insertion de la voiture
         tab_aleatoire[i] = 0;                       //On supprime le temps d'arrivée de la voiture inseré pour se repérer dans la liste
-        i++;                                        //INdice du prochain temps potentiel à ajouté
+        i++;                                        //Indice du prochain temps potentiel à ajouté
         if(i == N){
             creation_tableau(tab_aleatoire);
             i = 0;
-
         }
         der_tps+=(float)tps;                        //Heure d'arrivée de la nouvelle voiture ajouté
         tps = tab_aleatoire[i];                     //temps d'arrivée de la prochaine voiture
@@ -198,43 +194,41 @@ void ajout_voiture(float timer,Liste *liste, double tab_aleatoire[N]){   //Ajout
 float timer_reduit(float timer)// permet de travailler toujours dans l'intervalle du début
 {
     float new_timer = timer;
-    while (new_timer > T)
+    while (new_timer >= T)
         new_timer -= T;
     return new_timer;
 }
 
+//OK
 void simulation(float temps_simul) {
     Liste *File_voitures = creation();
     float timer = 0;
     double tab_aleatoire[N];
     creation_tableau(tab_aleatoire);
+    afficher_tab(tab_aleatoire);
+    printf("\n");
     float timer_red;
     while (timer < temps_simul) {
-
         timer_red = timer_reduit(timer);
-
-        while (timer_red < Tv - alpha && timer_red > 0 && timer < temps_simul) {   //Phase 1 : Feu vert
+        while ((timer_red < Tv - alpha) && (timer < temps_simul)) {   //Phase 1 : Feu vert
             avancer(File_voitures);
-            timer += alpha;
+            timer += (float)alpha;
             ajout_voiture(timer, File_voitures, tab_aleatoire);
             timer_red = timer_reduit(timer);
+            //printf("V %f\n",timer);
             afficher_liste(File_voitures);
         }
-
         timer_red = timer_reduit(timer);
-        while (timer_red >= Tv - alpha && timer_red <= T && timer < temps_simul) {    //Phase 3 : Feu rouge
-
+        if (((timer_red >= Tv - alpha) && (timer_red <= T)) && (timer < temps_simul)) {    //Phase 2 : Feu rouge
+            timer += T - timer_red;
             ajout_voiture(timer, File_voitures, tab_aleatoire);
-
-            timer += T - timer_red;                                  //On ajoute avant et après la mise à jour
-                                                                    // du timer en prévention d'un cas particulier un peu chiant, si alpha est tel que l'on saute la phase 2
-            ajout_voiture(timer, File_voitures, tab_aleatoire);
-            timer_red = timer_reduit(timer);
+            //printf("R %f\n",timer);
             afficher_liste(File_voitures);
         }
-        afficher_liste(File_voitures);
-
+        //printf("Boucle %f\n",timer);
+        //afficher_liste(File_voitures);
     }
+
 }
 
 
@@ -243,24 +237,6 @@ void simulation(float temps_simul) {
 
 
 int main() {
-    Liste *liste = creation();
-    /*double t[N];
-    creation_tableau(t);
-    //insertion(liste, 1);
-    afficher_tab(t);
-    ajout_voiture(200, liste, t);
-    printf("\n\n");
-    afficher_liste(liste);
-
-    afficher_tab(t);
-    int i = indice_tab(t);
-    printf("\n%d",i);*/
-    insertion(liste,3);
-    afficher_liste(liste);
-    avancer(liste);
-    avancer(liste);
-    insertion(liste,4);
-    afficher_liste(liste);
-    //simulation(1);
+    simulation(60);
     return 0;
 }
