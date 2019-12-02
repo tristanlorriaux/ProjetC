@@ -11,7 +11,7 @@
 #define alpha 3
 #define T 15   // période cycle
 #define Tv 10   // période feu vert
-#define N 100
+#define N 50
 
 
 // partie init----------------------------------------------------------------------------------------------------------
@@ -71,10 +71,11 @@ double temps_intermediaire(float a, float b){   //OK
     return X;
 }
 
-void creation_tableau (double tab[N]){          //OK
-    for (int i=0; i<N; i++)
+void creation_tableau (double tab[N], double der_val){          //OK
+    tab[0] = der_val;
+    for (int i=1; i<N; i++)
     {
-        tab[i] = temps_intermediaire(0,1);
+        tab[i] = tab[i-1]+temps_intermediaire(0,1);
     }
 }
 
@@ -167,25 +168,20 @@ int indice_tab(double tab[N]){  //Donne l'indice du premier élément qui n'est 
 //OK
 void ajout_voiture(float timer,Liste *liste, double tab_aleatoire[N]){   //Ajoute toutes les voitures qui n'ont pas été ajoutés jusqu'à timer
     int i = indice_tab(tab_aleatoire);             //indice du premier temps valide de la liste
-    if (i == N){                                   //SI le tableau est vide on en recalcule un nouveau
-        creation_tableau(tab_aleatoire);
+    if (i == N-1){
+        double der_val = tab_aleatoire[N-1]; //SI le tableau est vide on en recalcule un nouveau
+        creation_tableau(tab_aleatoire,der_val);
         i = 0;
     }
-    double tps = tab_aleatoire[i];                  //prochain temps aléatoire
-    Element *courant = malloc(sizeof(*courant));
-    courant = liste->premier;
-    while (courant->suiv != NULL)
-        courant = courant->suiv;
-    float der_tps = courant->voiture.ha;            //temps d'arrivée de la dernière voiture
-    while((float)tps + der_tps < timer ){           //On insère toutes les voitures qui sont arrivées avant le timer avec  tps + der_tps = ha dernière voiture
-        insertion(liste, (float)tps + der_tps); //Insertion de la voiture
+    double tps = tab_aleatoire[i];                  //prochain ha
+    while((float)tps  < timer ){                    //On insère toutes les voitures qui sont arrivées avant le timer
+        insertion(liste, (float)tps );              //Insertion de la voiture
         tab_aleatoire[i] = 0;                       //On supprime le temps d'arrivée de la voiture inseré pour se repérer dans la liste
         i++;                                        //Indice du prochain temps potentiel à ajouté
         if(i == N){
-            creation_tableau(tab_aleatoire);
+            creation_tableau(tab_aleatoire,0);
             i = 0;
         }
-        der_tps+=(float)tps;                        //Heure d'arrivée de la nouvelle voiture ajouté
         tps = tab_aleatoire[i];                     //temps d'arrivée de la prochaine voiture
     }
 }
@@ -202,26 +198,45 @@ float timer_reduit(float timer)// permet de travailler toujours dans l'intervall
 //OK
 void simulation(float temps_simul) {
     Liste *File_voitures = creation();
+    Liste *File_poubelle = creation();
     float timer = 0;
     double tab_aleatoire[N];
-    creation_tableau(tab_aleatoire);
+    creation_tableau(tab_aleatoire,0);
     afficher_tab(tab_aleatoire);
     printf("\n");
     float timer_red;
     while (timer < temps_simul) {
         timer_red = timer_reduit(timer);
         while ((timer_red < Tv - alpha) && (timer < temps_simul)) {   //Phase 1 : Feu vert
-            avancer(File_voitures);
-            timer += (float)alpha;                                      //Attention au cas où le feu est vert et qu'il n'y a pas de voiture dans la file
-            ajout_voiture(timer, File_voitures, tab_aleatoire);
-            timer_red = timer_reduit(timer);
+            if((File_voitures->premier)->suiv == NULL){
+                printf("V et vide");
+                timer += Tv-timer_red;
+                ajout_voiture(timer,File_poubelle,tab_aleatoire);
+                timer_red = timer_reduit(timer);
+            }
+            else{
+                avancer(File_voitures);
+                timer += (float)alpha;                                      //Attention au cas où le feu est vert et qu'il n'y a pas de voiture dans la file
+                ajout_voiture(timer, File_voitures, tab_aleatoire);
+                timer_red = timer_reduit(timer);
+            }
+
             //printf("V %f\n",timer);
             afficher_liste(File_voitures);
         }
         timer_red = timer_reduit(timer);
         if (((timer_red >= Tv - alpha) && (timer_red <= T)) && (timer < temps_simul)) {    //Phase 2 : Feu rouge
-            timer += T - timer_red;
-            ajout_voiture(timer, File_voitures, tab_aleatoire);
+            if((File_voitures->premier)->suiv == NULL && (timer_red < Tv)){
+                printf("V et vide");
+                timer += Tv-timer_red;
+                ajout_voiture(timer,File_poubelle,tab_aleatoire);
+                timer_red = timer_reduit(timer);
+            }
+            else{
+                timer += T - timer_red;
+                ajout_voiture(timer, File_voitures, tab_aleatoire);
+            }
+
             //printf("R %f\n",timer);
             afficher_liste(File_voitures);
         }
@@ -237,6 +252,6 @@ void simulation(float temps_simul) {
 
 
 int main() {
-    simulation(30);
+    simulation(1000);
     return 0;
 }
