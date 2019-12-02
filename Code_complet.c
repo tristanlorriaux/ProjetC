@@ -7,7 +7,7 @@
 
 
 
-#define lambda 0.25
+#define lambda 0.1
 #define alpha 3
 #define T 15   // période cycle
 #define Tv 10   // période feu vert
@@ -212,7 +212,7 @@ void simulation(float temps_simul) {
         timer_red = timer_reduit(timer);
         while ((timer_red < Tv - alpha) && (timer < temps_simul)) {   //Phase 1 : Feu vert
             avancer(File_voitures);
-            timer += (float)alpha;
+            timer += (float)alpha;                                      //Attention au cas où le feu est vert et qu'il n'y a pas de voiture dans la file
             ajout_voiture(timer, File_voitures, tab_aleatoire);
             timer_red = timer_reduit(timer);
             //printf("V %f\n",timer);
@@ -237,6 +237,6 @@ void simulation(float temps_simul) {
 
 
 int main() {
-    simulation(60);
+    simulation(30);
     return 0;
 }
