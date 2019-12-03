@@ -293,6 +293,19 @@ float timer_reduit(float timer)     // permet de travailler toujours dans l'inte
     return new_timer;
 }
 
+void tableau_de_bord(float T_simu, float tps_rep_moy, float max, float moyenne){
+    FILE *fichier;
+    fichier = fopen("tableau_de_bord.txt","w");
+    fprintf(fichier,"                         TABLEAU DE BORD\n\n");
+    fprintf(fichier,"Valeurs initiales : temps de simulation : %f\n", T_simu);
+    fprintf(fichier,"                    lambda : %f\n", lambda);
+    fprintf(fichier,"                    Tv : %f\n", Tv);
+    fprintf(fichier,"                    T : %f\n", T);
+    fprintf(fichier,"                    alpha : %f\n\n", alpha);
+    fprintf(fichier,"Résultats : Taille max : %f\n", max);
+    fprintf(fichier,"            Taille moyenne : %f\n", moyenne);
+    fprintf(fichier,"            Temps de réponse moyen : %f\n", tps_rep_moy);
+}
 
 
 // SIMULATION ----------------------------------------------------------------------------------------------------------
