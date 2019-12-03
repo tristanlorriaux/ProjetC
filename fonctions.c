@@ -75,7 +75,7 @@ float moyenne_file(void)
     return compteur;
 }
 
-float max_file(void)
+Data max_file(void)
 {
     FILE *fichier;
     Data data;
