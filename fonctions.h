@@ -14,8 +14,8 @@
 
 #define lambda 0.2
 #define alpha 1.5
-#define T 60                        // période cycle
-#define Tv  30                      // période feu vert
+#define T 60.0                      // période cycle
+#define Tv  30.0                     // période feu vert
 #define N 150                       //Taille tableau des Heures d'arrivées
 #define NOM_FIC   "data_voit.bin"   //Fichier pour Q3
 #define NOM_FIC2   "data_file.bin"  //Ficahier pour Q4
