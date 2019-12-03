@@ -12,14 +12,14 @@
 #include <errno.h>
 
 
-#define lambda 0.15
+#define lambda 0.2
 #define alpha 1.5
 #define T 60                        // période cycle
 #define Tv  30                      // période feu vert
 #define N 150                       //Taille tableau des Heures d'arrivées
 #define NOM_FIC   "data_voit.bin"   //Fichier pour Q3
-#define NOM_FIC2   "data_file.bin"  //Fichier pour Q4
-
+#define NOM_FIC2   "data_file.bin"  //Ficahier pour Q4
+#define NOM_FIC3   "data_file.txt"  //Fichier pour Q5
 
 
 typedef struct{
@@ -67,3 +67,4 @@ int simulation(float temps_simul);
 float tps_rep_moy(void);
 float max_file(void);
 float moyenne_file(void);
+void ajout_file_fichtxt(Liste *liste);
