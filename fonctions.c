@@ -329,6 +329,11 @@ int simulation(float temps_simul)       //Fonction qui génère une simulation
                 ajout_file_fich(File_voitures);
             }
             afficher_liste(File_voitures);
+            courant = File_poubelle->premier;   //ajout des voitures de file_poubelle dans le fichier data_voit
+            while (courant->suiv != NULL){
+                ajout_voit_fich(courant->voiture);
+                courant = courant->suiv;
+            }
         }
     }
     return 0;
