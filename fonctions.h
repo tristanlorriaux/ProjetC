@@ -17,8 +17,8 @@
 #define T 60                        // période cycle
 #define Tv  30                      // période feu vert
 #define N 150                       //Taille tableau des Heures d'arrivées
-#define NOM_FIC   "data_voit.txt"   //Fichier pour Q3
-#define NOM_FIC2   "data_file.txt"  //Fichier pour Q4
+#define NOM_FIC   "data_voit.bin"   //Fichier pour Q3
+#define NOM_FIC2   "data_file.bin"  //Fichier pour Q4
 
 
 
@@ -64,3 +64,6 @@ int indice_tab(double tab[N]);
 void ajout_voiture(float timer,Liste *liste, double tab_aleatoire[N]);
 float timer_reduit(float timer);
 int simulation(float temps_simul);
+float tps_rep_moy(void);
+float max_file(void);
+float moyenne_file(void);
