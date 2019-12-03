@@ -8,9 +8,9 @@
 
 
 #define lambda 0.15
-#define alpha 3
+#define alpha 1.5
 #define T 15   // période cycle
-#define Tv 10   // période feu vert
+#define Tv  3  // période feu vert
 #define N 50
 #define NOM_FIC   "data.txt"
 
@@ -91,6 +91,7 @@ void afficher_tab(double tab[N]){
     for(int i = 0; i<N; i++){
         printf("%f ",tab[i]);
     }
+    printf("\n");
 }
 
 //OK
@@ -120,7 +121,7 @@ void afficher_liste(Liste *liste)
 
 
 //OK
-void insertion(Liste *liste, float ha) //Insère une voiture à la fin de la file d'attente
+void insertion(Liste *liste, float ha, float indice) //Insère une voiture à la fin de la file d'attente
 {
     /* Création du nouvel élément */
     Element *nouveau = malloc(sizeof(*nouveau));
@@ -133,13 +134,11 @@ void insertion(Liste *liste, float ha) //Insère une voiture à la fin de la fil
     nouveau->voiture.t_passage = 0;
     courant = liste->premier;
     /* Insertion de l'élément à la fin de la liste */
-    int cmpt = 0;           //Compte le nombre de voiture dans la file
-    while (courant->suiv != NULL)
+    while (courant->suiv != NULL)  //On actualise les indices de chaque voiture
         courant = courant->suiv;
-        cmpt++;
     nouveau->suiv = NULL;
-    nouveau->voiture.indice = (float)(cmpt+1);
-    nouveau->voiture.t_att = (float)(cmpt+1)*alpha;    //Temps de passage proportionnel à sont indice dans la file
+    nouveau->voiture.indice = (float)(indice);
+    nouveau->voiture.t_passage = ((float)indice)*alpha;    //Temps de passage proportionnel à sont indice dans la file
     courant->suiv = nouveau;
 }
 
@@ -153,12 +152,14 @@ void avancer(Liste *liste,float timer){ // Fais avancer la filed'attente de une 
         courant->voiture.t_att = timer - courant->voiture.ha - courant->voiture.t_passage;      //temps d'attente (temps voiture immobile)
         ajout_voit_fich(courant->voiture);                                                      //c'est bien le temps passé dans la file - temps de passage
         courant = courant->suiv;
+
         liste->premier = courant;
+
         while (courant->suiv != NULL){  //On actualise les indices de chaque voiture
             courant->voiture.indice -= 1;
             courant = courant->suiv;
         }
-
+        courant->voiture.indice -= 1;
     }
 }
 
@@ -177,22 +178,31 @@ int indice_tab(double tab[N]){  //Donne l'indice du premier élément qui n'est 
 
 //OK
 void ajout_voiture(float timer,Liste *liste, double tab_aleatoire[N]){   //Ajoute toutes les voitures qui n'ont pas été ajoutés jusqu'à timer
-    int i = indice_tab(tab_aleatoire);             //indice du premier temps valide de la liste
+    int i = indice_tab(tab_aleatoire);                                  //indice du premier temps valide de la liste
+    float cmpt = 0;
+    Element *courant;
+    courant = liste->premier;
+    while (courant->suiv != NULL){
+        courant = courant->suiv;
+        cmpt++;
+    }
     if (i == N-1){
-        double der_val = tab_aleatoire[N-1]; //SI le tableau est vide on en recalcule un nouveau
-        creation_tableau(tab_aleatoire,der_val);
+        creation_tableau(tab_aleatoire,tab_aleatoire[N-1]);
+        afficher_tab(tab_aleatoire);
         i = 0;
     }
-    double tps = tab_aleatoire[i];                  //prochain ha
-    while((float)tps  < timer ){                    //On insère toutes les voitures qui sont arrivées avant le timer
-        insertion(liste, (float)tps );              //Insertion de la voiture
-        tab_aleatoire[i] = 0;                       //On supprime le temps d'arrivée de la voiture inseré pour se repérer dans la liste
-        i++;                                        //Indice du prochain temps potentiel à ajouté
-        if(i == N){
-            creation_tableau(tab_aleatoire,temps_intermediaire(0,1));
+    double tps = tab_aleatoire[i];                                  //prochain ha
+    while((float)tps  < timer ){                                    //On insère toutes les voitures qui sont arrivées avant le timer
+        insertion(liste, (float)tps, cmpt+1);                //Insertion de la voiture
+        tab_aleatoire[i] = 0;                                       //On supprime le temps d'arrivée de la voiture inseré pour se repérer dans la liste
+        i++;                                                        //Indice du prochain temps potentiel à ajouté
+        if(i == N-1){
+            creation_tableau(tab_aleatoire,tab_aleatoire[N-1]);
+            afficher_tab(tab_aleatoire);
             i = 0;
         }
         tps = tab_aleatoire[i];                     //temps d'arrivée de la prochaine voiture
+        cmpt++;
     }
 }
 
@@ -266,6 +276,6 @@ int simulation(float temps_simul) {
 
 
 int main() {
-    simulation(600);
+    simulation(800);
     return 0;
 }
