@@ -11,7 +11,7 @@
 
 // Partie initialisation----------------------------------------------------------------------------------------------------------
 
-Liste *creation()       //Fonction de création d'une liste
+Liste *creation()
 {
     /*création d'une liste chaînée vide*/
     Liste *liste = malloc(sizeof(*liste));
@@ -34,19 +34,19 @@ int indice_tab(double tab[N]);
 
 //Partie aléatoire -----------------------------------------------------------------------------------------------------
 
-double frand_a_b(float a, float b)      //fonction qui renvoie un flotant entre a et b
+double frand_a_b(float a, float b)
 {
     return ( (double)rand()/(double)RAND_MAX ) * (b-a) + a;
 }
 
-double temps_intermediaire(float a, float b)        //fonction qui renvoie un temps aléatoire pour deux bornes a et b
+double temps_intermediaire(float a, float b)
 {
     double U = frand_a_b(a, b);
     double X = -log(1 - U )/lambda;
     return X;
 }
 
-void creation_tableau (double tab[N], double der_val)       //fonction qui crée un tableau et qui le remplit de temps aléatoires cumulés
+void creation_tableau (double tab[N], double der_val)
 {
     tab[0] = der_val;
     for (int i=1; i<N; i++)
@@ -64,28 +64,27 @@ float moyenne_file(void)
     Data data;
     float moyenne;
     float somme = 0;
-    int compteur = 0;
-    fichier = fopen("data_file.txt", "r+");
-    while (fread(&data, sizeof(data), 1, fichier) == 1) {
+    float compteur = 0;
+    fichier = fopen(NOM_FIC2, "r+");
+    while (fread(&data, sizeof(Data), 1, fichier) == 1) {
         somme = somme + data.taille;
         compteur++;
     }
     moyenne = somme / compteur;
-    printf("La taille moyenne d'une file d'attente vaut %f", moyenne);
-    return compteur;
+    printf("La taille moyenne d'une file d'attente vaut %f\ns", moyenne);
+    return moyenne;
 }
 
-Data max_file(void)
+float max_file(void)
 {
     FILE *fichier;
     Data data;
-    Data max;
-    max.taille=0;
-    fichier = fopen("data_file.txt","r+");
-    while (fread(&data, sizeof(data), 1, fichier) == 1)
-        if (data.taille > max.taille)
-            max=data;
-    printf("La taille maximale vaut %f", max.taille);
+    float max = 0;
+    fichier = fopen(NOM_FIC2,"r+");
+    while (fread(&data, sizeof(Data), 1, fichier) == 1)
+        if (data.taille > max)
+            max=data.taille;
+    printf("La taille maximale vaut %f\n", max);
     return max;
 }
 
@@ -95,15 +94,15 @@ float tps_rep_moy(void)
     Voiture voiture;
     float somme = 0;
     float cmpt = 0;
-    fichier = fopen("data_voiture.txt","r+");
-    while (fread(&voiture, sizeof(voiture), 1, fichier) == 1)
+    fichier = fopen(NOM_FIC,"r+");
+    while (fread(&voiture, sizeof(Voiture), 1, fichier) == 1)
     {
         somme += voiture.t_passage + voiture.t_att;
         cmpt++;
     }
+    printf("La temps de réponse moyen vaut %f\ns", somme/cmpt);
     return somme/cmpt;
 }
-
 
 
 //Partie utilitaire-----------------------------------------------------------------------------------------------------
@@ -111,7 +110,7 @@ float tps_rep_moy(void)
 
 //Affichage _____________________________________________________________________________________________________
 
-void afficher_tab(double tab[N])        //Fonction qui affiche un tableau
+void afficher_tab(double tab[N])
 {
     for(int i = 0; i<N; i++)
     {
@@ -121,7 +120,7 @@ void afficher_tab(double tab[N])        //Fonction qui affiche un tableau
 }
 
 
-void afficher_liste(Liste *liste)       //Fonction qui affiche une liste chaînée
+void afficher_liste(Liste *liste)
 {
     if(liste==NULL)
         exit(EXIT_FAILURE);
@@ -136,15 +135,15 @@ void afficher_liste(Liste *liste)       //Fonction qui affiche une liste chaîn�
     printf("\n\n");
 }
 
-
-void afficher_Data(Data data)       //Fonction qui affiche une data
+//OK
+void afficher_Data(Data data)       //affiche une data
 {
     printf("taille: %f temps: %f\n", data.taille, data.temps);
 }
 
 //Ajout_________________________________________________________________________________________________________
-
-void ajout_file_fich(Liste *liste)      //Fonction qui joute les données utiles à la question 4 d'une file d'attente dans le fichier correspondant
+//OK
+void ajout_file_fich(Liste *liste)      //Ajoute les données utiles pour la question 4- d'une file d'attente dans le fichier correspondant
 {
     FILE *fic;
     Data data;
@@ -163,7 +162,7 @@ void ajout_file_fich(Liste *liste)      //Fonction qui joute les données utiles
 }
 
 //OK
-void ajout_voit_fich(Voiture voit)      //Fonction qui ajoute les données de la voiture dans un fichier
+void ajout_voit_fich(Voiture voit)
 {
     FILE *fic;
     fic = fopen(NOM_FIC, "a");
@@ -172,7 +171,7 @@ void ajout_voit_fich(Voiture voit)      //Fonction qui ajoute les données de la
 }
 
 //OK
-void insertion(Liste *liste, float ha, float indice)        //Fonction qui insère une voiture à la fin de la file d'attente
+void insertion(Liste *liste, float ha, float indice)        //Insère une voiture à la fin de la file d'attente
 {
     /* Création du nouvel élément */
     Element *nouveau = malloc(sizeof(*nouveau));
@@ -194,7 +193,7 @@ void insertion(Liste *liste, float ha, float indice)        //Fonction qui insè
 }
 
 
-void ajout_voiture(float timer,Liste *liste, double tab_aleatoire[N])       //Fonction qui ajoute toutes les voitures qui n'ont pas été ajoutés jusqu'à timer
+void ajout_voiture(float timer,Liste *liste, double tab_aleatoire[N])       //Ajoute toutes les voitures qui n'ont pas été ajoutés jusqu'à timer
 {
     int i = indice_tab(tab_aleatoire);                                  //indice du premier temps valide de la liste
     float cmpt = 0;
@@ -229,8 +228,8 @@ void ajout_voiture(float timer,Liste *liste, double tab_aleatoire[N])       //Fo
 }
 //Fonctions utiles pour les files_______________________________________________________________________________
 
-//OK
-void avancer(Liste *liste,float timer)      //Fonction qui fait avancer la filed'attente de une place (La tête pointe dorénavant sur la deuxième voiture)
+
+void avancer(Liste *liste,float timer)      //Fais avancer la filed'attente de une place (La tête point dorénavant sur la deuxième voiture)
 {
     Element *nouveau = liste->premier;
     if(nouveau->suiv != NULL)
@@ -255,9 +254,8 @@ void avancer(Liste *liste,float timer)      //Fonction qui fait avancer la filed
 
 
 
-//OK
-int indice_tab(double tab[N])        //Donne l'indice du premier élément qui n'est pas un 0 de la liste
-{     
+int indice_tab(double tab[N])
+{      //Donne l'indice du premier élément qui n'est pas un 0 de la liste
     int i = 0;
     while(tab[i] == 0 && i != N)
     {
@@ -267,7 +265,7 @@ int indice_tab(double tab[N])        //Donne l'indice du premier élément qui n
 }
 
 
-float timer_reduit(float timer)     // Fonction qui permet de travailler toujours dans l'intervalle du début
+float timer_reduit(float timer)     // permet de travailler toujours dans l'intervalle du début
 {
     float new_timer = timer;
     while (new_timer >= T)
@@ -279,9 +277,9 @@ float timer_reduit(float timer)     // Fonction qui permet de travailler toujour
 
 // SIMULATION ----------------------------------------------------------------------------------------------------------
 
-//OK
 
-int simulation(float temps_simul)       //Fonction qui génère une simulation
+
+int simulation(float temps_simul)
 {
     Liste *File_voitures = creation();
     Liste *File_poubelle = creation();
@@ -296,8 +294,8 @@ int simulation(float temps_simul)       //Fonction qui génère une simulation
         timer_red = timer_reduit(timer);
         while ((timer_red < Tv - alpha) && (timer < temps_simul))
         {     //Phase 1 : Feu vert
-            if((File_voitures->premier)->suiv == NULL)      //Attention au cas où le feu est vert et qu'il n'y a pas de voiture dans la file
-            {                 
+            if((File_voitures->premier)->suiv == NULL)
+            {                 //Attention au cas où le feu est vert et qu'il n'y a pas de voiture dans la file
                 printf("V et vide 1");
                 timer += Tv-timer_red;
                 ajout_voiture(timer,File_poubelle,tab_aleatoire);
@@ -329,11 +327,6 @@ int simulation(float temps_simul)       //Fonction qui génère une simulation
                 ajout_file_fich(File_voitures);
             }
             afficher_liste(File_voitures);
-            courant = File_poubelle->premier;   //ajout des voitures de file_poubelle dans le fichier data_voit
-            while (courant->suiv != NULL){
-                ajout_voit_fich(courant->voiture);
-                courant = courant->suiv;
-            }
         }
     }
     return 0;
