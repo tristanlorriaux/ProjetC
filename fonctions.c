@@ -1,13 +1,11 @@
 #include "fonctions.h"
 
 
-#define lambda 0.15
+#define lambda 0.2
 #define alpha 1.5
 #define T 60                        // période cycle
 #define Tv  30                      // période feu vert
 #define N 150                       //Taille tableau des Heures d'arrivées
-#define NOM_FIC   "data_voit.txt"   //Fichier pour Q3
-#define NOM_FIC2   "data_file.txt"  //Fichier pour Q4
 
 // Partie initialisation----------------------------------------------------------------------------------------------------------
 
@@ -67,11 +65,13 @@ float moyenne_file(void)
     float compteur = 0;
     fichier = fopen(NOM_FIC2, "r+");
     while (fread(&data, sizeof(Data), 1, fichier) == 1) {
+
         somme = somme + data.taille;
         compteur++;
     }
     moyenne = somme / compteur;
-    printf("La taille moyenne d'une file d'attente vaut %f\ns", moyenne);
+    printf("La taille moyenne d'une file d'attente vaut %fs\n", moyenne);
+    fclose(fichier);
     return moyenne;
 }
 
@@ -85,6 +85,7 @@ float max_file(void)
         if (data.taille > max)
             max=data.taille;
     printf("La taille maximale vaut %f\n", max);
+    fclose(fichier);
     return max;
 }
 
@@ -100,7 +101,8 @@ float tps_rep_moy(void)
         somme += voiture.t_passage + voiture.t_att;
         cmpt++;
     }
-    printf("La temps de réponse moyen vaut %f\ns", somme/cmpt);
+    printf("La temps de réponse moyen vaut %fs\n", somme/cmpt);
+    fclose(fichier);
     return somme/cmpt;
 }
 
@@ -160,6 +162,24 @@ void ajout_file_fich(Liste *liste)      //Ajoute les données utiles pour la que
     fwrite(&data, sizeof(Data), 1, fic);
     fclose(fic);
 }
+
+void ajout_file_fichtxt(Liste *liste)      //Ajoute les données utiles pour la question 4- d'une file d'attente dans le fichier correspondant
+{
+    FILE *fic;
+
+    fic = fopen(NOM_FIC3, "a");
+    Element *courant;
+    courant = liste->premier;
+    while (courant->suiv != NULL)       //On récupère la taille de la file et l'heure
+    {
+        courant = courant->suiv;
+    }
+    float ind = courant->voiture.indice;
+    float temps = courant->voiture.ha;
+    fprintf(fic,"%f %f\n",temps,ind);
+    fclose(fic);
+}
+
 
 //OK
 void ajout_voit_fich(Voiture voit)
@@ -307,6 +327,7 @@ int simulation(float temps_simul)
                 avancer(File_voitures,timer);
                 ajout_voiture(timer, File_voitures, tab_aleatoire);
                 ajout_file_fich(File_voitures);
+                ajout_file_fichtxt(File_voitures);
                 timer_red = timer_reduit(timer);
             }
             afficher_liste(File_voitures);
@@ -325,6 +346,8 @@ int simulation(float temps_simul)
                 timer += T - timer_red;
                 ajout_voiture(timer, File_voitures, tab_aleatoire);
                 ajout_file_fich(File_voitures);
+                ajout_file_fichtxt(File_voitures);
+
             }
             afficher_liste(File_voitures);
         }
