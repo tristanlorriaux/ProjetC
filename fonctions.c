@@ -55,7 +55,54 @@ void creation_tableau (double tab[N], double der_val)       //fonction qui crée
     }
 }
 
+//Parite statistiques---------------------------------------------------------------------------------------------------
 
+
+float moyenne_file(void)
+{
+    FILE *fichier;
+    Data data;
+    float moyenne;
+    float somme = 0;
+    int compteur = 0;
+    fichier = fopen("data_file.txt", "r+");
+    while (fread(&data, sizeof(data), 1, fichier) == 1) {
+        somme = somme + data.taille;
+        compteur++;
+    }
+    moyenne = somme / compteur;
+    printf("La taille moyenne d'une file d'attente vaut %f", moyenne);
+    return compteur;
+}
+
+float max_file(void)
+{
+    FILE *fichier;
+    Data data;
+    Data max;
+    max.taille=0;
+    fichier = fopen("data_file.txt","r+");
+    while (fread(&data, sizeof(data), 1, fichier) == 1)
+        if (data.taille > max.taille)
+            max=data;
+    printf("La taille maximale vaut %f", max.taille);
+    return max;
+}
+
+float tps_rep_moy(void)
+{
+    FILE *fichier;
+    Voiture voiture;
+    float somme = 0;
+    float cmpt = 0;
+    fichier = fopen("data_voiture.txt","r+");
+    while (fread(&voiture, sizeof(voiture), 1, fichier) == 1)
+    {
+        somme += voiture.t_passage + voiture.t_att;
+        cmpt++;
+    }
+    return somme/cmpt;
+}
 
 
 
