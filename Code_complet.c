@@ -9,10 +9,11 @@
 
 #define lambda 0.15
 #define alpha 1.5
-#define T 15   // période cycle
-#define Tv  3  // période feu vert
-#define N 50
-#define NOM_FIC   "data.txt"
+#define T 60                        // période cycle
+#define Tv  30                      // période feu vert
+#define N 150                       //Taille tableau des Heures d'arrivées
+#define NOM_FIC   "data_voit.txt"   //Fichier pour Q3
+#define NOM_FIC2   "data_file.txt"  //Fichier pour Q4
 
 // partie init----------------------------------------------------------------------------------------------------------
 
@@ -25,6 +26,10 @@ typedef struct{                     //OK
     float t_passage;
 } Voiture;
 
+typedef struct{                     //OK
+    float taille;
+    float temps;
+} Data;
 
 typedef struct Element Element;     //OK
 struct Element
@@ -58,7 +63,9 @@ Liste *creation()                   //OK
     liste->premier = Element;
     return liste;
 }
+
 void ajout_voit_fich(Voiture voit);
+int indice_tab(double tab[N]);
 
 //Partie aléatoire -----------------------------------------------------------------------------------------------------
 
@@ -86,6 +93,8 @@ void creation_tableau (double tab[N], double der_val){          //OK
 
 //Partie utilitaire-----------------------------------------------------------------------------------------------------
 
+
+        //Affichage _____________________________________________________________________________________________________
 //OK
 void afficher_tab(double tab[N]){
     for(int i = 0; i<N; i++){
@@ -110,15 +119,37 @@ void afficher_liste(Liste *liste)
     printf("\n\n");
 }
 
-/*int convertisseur (int s)//Covertisseur secondes -> heures      //OK
+//OK
+void afficher_Data(Data data) //affiche une data
 {
-    int m,h,rs;
-    h=s/3600;
-    m=s%60;
-    rs=s%60;
-    return h,m,rs;
-}*/
+    printf("taille: %f temps: %f\n", data.taille, data.temps);
+}
 
+        //Ajout_________________________________________________________________________________________________________
+//OK
+void ajout_file_fich(Liste *liste){ //Ajoute les données utiles pour la question 4- d'une file d'attente dans le fichier correspondant
+    FILE *fic;
+    Data data;
+    fic = fopen(NOM_FIC2, "a");
+    Element *courant;
+    courant = liste->premier;
+    while (courant->suiv != NULL){  //On récupère la taille de la file et l'heure
+        courant = courant->suiv;
+    }
+    data.taille = courant->voiture.indice;
+    data.temps = courant->voiture.ha;
+    afficher_Data(data);
+    fwrite(&data, sizeof(Data), 1, fic);
+    fclose(fic);
+}
+
+//OK
+void ajout_voit_fich(Voiture voit){
+    FILE *fic;
+    fic = fopen(NOM_FIC, "a");
+    fwrite(&voit, sizeof(Voiture), 1, fic);
+    fclose(fic);
+}
 
 //OK
 void insertion(Liste *liste, float ha, float indice) //Insère une voiture à la fin de la file d'attente
@@ -141,40 +172,6 @@ void insertion(Liste *liste, float ha, float indice) //Insère une voiture à la
     nouveau->voiture.t_passage = ((float)indice)*alpha;    //Temps de passage proportionnel à sont indice dans la file
     courant->suiv = nouveau;
 }
-
-
-//OK
-void avancer(Liste *liste,float timer){ // Fais avancer la filed'attente de une place (La tête point dorénavant sur la deuxième voiture)
-    Element *nouveau = liste->premier;
-    if(nouveau->suiv != NULL) {
-        Element *courant;
-        courant = liste->premier;
-        courant->voiture.t_att = timer - courant->voiture.ha - courant->voiture.t_passage;      //temps d'attente (temps voiture immobile)
-        ajout_voit_fich(courant->voiture);                                                      //c'est bien le temps passé dans la file - temps de passage
-        courant = courant->suiv;
-
-        liste->premier = courant;
-
-        while (courant->suiv != NULL){  //On actualise les indices de chaque voiture
-            courant->voiture.indice -= 1;
-            courant = courant->suiv;
-        }
-        courant->voiture.indice -= 1;
-    }
-}
-
-
-
-//OK
-int indice_tab(double tab[N]){  //Donne l'indice du premier élément qui n'est pas un 0 de la liste
-    int i = 0;
-    while(tab[i] == 0 && i != N){
-        i++;
-    }
-    return i;
-}
-
-
 
 //OK
 void ajout_voiture(float timer,Liste *liste, double tab_aleatoire[N]){   //Ajoute toutes les voitures qui n'ont pas été ajoutés jusqu'à timer
@@ -205,8 +202,41 @@ void ajout_voiture(float timer,Liste *liste, double tab_aleatoire[N]){   //Ajout
         cmpt++;
     }
 }
+        //Fonctions utiles pour les files_______________________________________________________________________________
 
 //OK
+void avancer(Liste *liste,float timer){ // Fais avancer la filed'attente de une place (La tête point dorénavant sur la deuxième voiture)
+    Element *nouveau = liste->premier;
+    if(nouveau->suiv != NULL) {
+        Element *courant;
+        courant = liste->premier;
+        courant->voiture.t_att = timer - courant->voiture.ha - courant->voiture.t_passage;      //temps d'attente (temps voiture immobile)
+        printf("t_att = %f\n", courant->voiture.t_att);
+        ajout_voit_fich(courant->voiture);                                                      //c'est bien le temps passé dans la file - temps de passage
+        courant = courant->suiv;
+
+        liste->premier = courant;
+
+        while (courant->suiv != NULL){  //On actualise les indices de chaque voiture
+            courant->voiture.indice -= 1;
+            courant = courant->suiv;
+        }
+        courant->voiture.indice -= 1;
+    }
+}
+
+
+
+//OK
+int indice_tab(double tab[N]){  //Donne l'indice du premier élément qui n'est pas un 0 de la liste
+    int i = 0;
+    while(tab[i] == 0 && i != N){
+        i++;
+    }
+    return i;
+}
+
+
 float timer_reduit(float timer)// permet de travailler toujours dans l'intervalle du début
 {
     float new_timer = timer;
@@ -215,12 +245,7 @@ float timer_reduit(float timer)// permet de travailler toujours dans l'intervall
     return new_timer;
 }
 
-void ajout_voit_fich(Voiture voit){
-    FILE *fic;
-    fic = fopen(NOM_FIC, "a");
-    fwrite(&voit, sizeof(Voiture), 1, fic);
-    fclose(fic);
-}
+
 
 // SIMULATION ----------------------------------------------------------------------------------------------------------
 
@@ -247,6 +272,7 @@ int simulation(float temps_simul) {
                 timer += (float)alpha;
                 avancer(File_voitures,timer);
                 ajout_voiture(timer, File_voitures, tab_aleatoire);
+                ajout_file_fich(File_voitures);
                 timer_red = timer_reduit(timer);
             }
             afficher_liste(File_voitures);
@@ -257,12 +283,11 @@ int simulation(float temps_simul) {
                 printf("V et vide 2");
                 timer += Tv-timer_red;
                 ajout_voiture(timer,File_poubelle,tab_aleatoire);
-                timer_red = timer_reduit(timer);
             }
             else{
                 timer += T - timer_red;
                 ajout_voiture(timer, File_voitures, tab_aleatoire);
-
+                ajout_file_fich(File_voitures);
             }
             afficher_liste(File_voitures);
         }
@@ -276,6 +301,6 @@ int simulation(float temps_simul) {
 
 
 int main() {
-    simulation(800);
+    simulation(200);
     return 0;
 }
