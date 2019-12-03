@@ -11,7 +11,7 @@
 
 // Partie initialisation----------------------------------------------------------------------------------------------------------
 
-Liste *creation()
+Liste *creation()       //Fonction de création d'une liste
 {
     /*création d'une liste chaînée vide*/
     Liste *liste = malloc(sizeof(*liste));
@@ -34,19 +34,19 @@ int indice_tab(double tab[N]);
 
 //Partie aléatoire -----------------------------------------------------------------------------------------------------
 
-double frand_a_b(float a, float b)
+double frand_a_b(float a, float b)      //fonction qui renvoie un flotant entre a et b
 {
     return ( (double)rand()/(double)RAND_MAX ) * (b-a) + a;
 }
 
-double temps_intermediaire(float a, float b)
+double temps_intermediaire(float a, float b)        //fonction qui renvoie un temps aléatoire pour deux bornes a et b
 {
     double U = frand_a_b(a, b);
     double X = -log(1 - U )/lambda;
     return X;
 }
 
-void creation_tableau (double tab[N], double der_val)
+void creation_tableau (double tab[N], double der_val)       //fonction qui crée un tableau et qui le remplit de temps aléatoires cumulés
 {
     tab[0] = der_val;
     for (int i=1; i<N; i++)
@@ -64,7 +64,7 @@ void creation_tableau (double tab[N], double der_val)
 
 //Affichage _____________________________________________________________________________________________________
 
-void afficher_tab(double tab[N])
+void afficher_tab(double tab[N])        //Fonction qui affiche un tableau
 {
     for(int i = 0; i<N; i++)
     {
@@ -74,7 +74,7 @@ void afficher_tab(double tab[N])
 }
 
 
-void afficher_liste(Liste *liste)
+void afficher_liste(Liste *liste)       //Fonction qui affiche une liste chaînée
 {
     if(liste==NULL)
         exit(EXIT_FAILURE);
@@ -89,15 +89,15 @@ void afficher_liste(Liste *liste)
     printf("\n\n");
 }
 
-//OK
-void afficher_Data(Data data)       //affiche une data
+
+void afficher_Data(Data data)       //Fonction qui affiche une data
 {
     printf("taille: %f temps: %f\n", data.taille, data.temps);
 }
 
 //Ajout_________________________________________________________________________________________________________
-//OK
-void ajout_file_fich(Liste *liste)      //Ajoute les données utiles pour la question 4- d'une file d'attente dans le fichier correspondant
+
+void ajout_file_fich(Liste *liste)      //Fonction qui joute les données utiles à la question 4 d'une file d'attente dans le fichier correspondant
 {
     FILE *fic;
     Data data;
@@ -116,7 +116,7 @@ void ajout_file_fich(Liste *liste)      //Ajoute les données utiles pour la que
 }
 
 //OK
-void ajout_voit_fich(Voiture voit)
+void ajout_voit_fich(Voiture voit)      //Fonction qui ajoute les données de la voiture dans un fichier
 {
     FILE *fic;
     fic = fopen(NOM_FIC, "a");
@@ -125,7 +125,7 @@ void ajout_voit_fich(Voiture voit)
 }
 
 //OK
-void insertion(Liste *liste, float ha, float indice)        //Insère une voiture à la fin de la file d'attente
+void insertion(Liste *liste, float ha, float indice)        //Fonction qui insère une voiture à la fin de la file d'attente
 {
     /* Création du nouvel élément */
     Element *nouveau = malloc(sizeof(*nouveau));
@@ -146,8 +146,8 @@ void insertion(Liste *liste, float ha, float indice)        //Insère une voitur
     courant->suiv = nouveau;
 }
 
-//OK
-void ajout_voiture(float timer,Liste *liste, double tab_aleatoire[N])       //Ajoute toutes les voitures qui n'ont pas été ajoutés jusqu'à timer
+
+void ajout_voiture(float timer,Liste *liste, double tab_aleatoire[N])       //Fonction qui ajoute toutes les voitures qui n'ont pas été ajoutés jusqu'à timer
 {
     int i = indice_tab(tab_aleatoire);                                  //indice du premier temps valide de la liste
     float cmpt = 0;
@@ -183,7 +183,7 @@ void ajout_voiture(float timer,Liste *liste, double tab_aleatoire[N])       //Aj
 //Fonctions utiles pour les files_______________________________________________________________________________
 
 //OK
-void avancer(Liste *liste,float timer)      //Fais avancer la filed'attente de une place (La tête point dorénavant sur la deuxième voiture)
+void avancer(Liste *liste,float timer)      //Fonction qui fait avancer la filed'attente de une place (La tête pointe dorénavant sur la deuxième voiture)
 {
     Element *nouveau = liste->premier;
     if(nouveau->suiv != NULL)
@@ -209,8 +209,8 @@ void avancer(Liste *liste,float timer)      //Fais avancer la filed'attente de u
 
 
 //OK
-int indice_tab(double tab[N])
-{      //Donne l'indice du premier élément qui n'est pas un 0 de la liste
+int indice_tab(double tab[N])        //Donne l'indice du premier élément qui n'est pas un 0 de la liste
+{     
     int i = 0;
     while(tab[i] == 0 && i != N)
     {
@@ -220,7 +220,7 @@ int indice_tab(double tab[N])
 }
 
 
-float timer_reduit(float timer)     // permet de travailler toujours dans l'intervalle du début
+float timer_reduit(float timer)     // Fonction qui permet de travailler toujours dans l'intervalle du début
 {
     float new_timer = timer;
     while (new_timer >= T)
@@ -234,7 +234,7 @@ float timer_reduit(float timer)     // permet de travailler toujours dans l'inte
 
 //OK
 
-int simulation(float temps_simul)
+int simulation(float temps_simul)       //Fonction qui génère une simulation
 {
     Liste *File_voitures = creation();
     Liste *File_poubelle = creation();
@@ -249,8 +249,8 @@ int simulation(float temps_simul)
         timer_red = timer_reduit(timer);
         while ((timer_red < Tv - alpha) && (timer < temps_simul))
         {     //Phase 1 : Feu vert
-            if((File_voitures->premier)->suiv == NULL)
-            {                 //Attention au cas où le feu est vert et qu'il n'y a pas de voiture dans la file
+            if((File_voitures->premier)->suiv == NULL)      //Attention au cas où le feu est vert et qu'il n'y a pas de voiture dans la file
+            {                 
                 printf("V et vide 1");
                 timer += Tv-timer_red;
                 ajout_voiture(timer,File_poubelle,tab_aleatoire);
