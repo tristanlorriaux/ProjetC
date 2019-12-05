@@ -58,12 +58,13 @@ float moyenne_file(void)
     float moyenne ;
     float somme = 0;
     float compteur = 0;
-    fichier = fopen(NOM_FIC2, "r");
+    fichier = fopen(DAT, "r");
     while (fread(&data, sizeof(Data), 1, fichier) == 1) {
         somme = somme + data.taille;
         compteur++;
     }
     moyenne = somme / compteur;
+
     printf("La taille moyenne d'une file d'attente vaut %f\n", moyenne);
     fclose(fichier);
     return moyenne;
@@ -74,10 +75,13 @@ float max_file(void)
     FILE *fichier;
     Data data;
     float max = 0;
-    fichier = fopen(NOM_FIC2,"r");
-    while ((fread(&data, sizeof(Data), 1, fichier) == 1) && (data.taille > max))
+    fichier = fopen(DAT,"r");
+    while (fread(&data, sizeof(Data), 1, fichier) == 1)
     {
-        max = data.taille;
+        if(data.taille > max){
+            max = data.taille;
+        }
+
     }
     printf("La taille maximale vaut %f\n", max);
     fclose(fichier);
@@ -90,12 +94,14 @@ float tps_rep_moy(void)
     Voiture voiture;
     float somme = 0;
     float cmpt = 0;
-    fichier = fopen(NOM_FIC,"r");
+    fichier = fopen(BIN,"r");
     while (fread(&voiture, sizeof(Voiture), 1, fichier) == 1)
     {
         somme += voiture.t_passage + voiture.t_att;
         cmpt++;
+
     }
+
     printf("La temps de réponse moyen vaut %fs\n", somme/cmpt);
     fclose(fichier);
     return somme/cmpt;
@@ -140,11 +146,11 @@ void afficher_Data(Data data)       //affiche une data
 
 //Ajout_________________________________________________________________________________________________________
 //OK
-void ajout_file_fich(Liste *liste)      //Ajoute les données utiles pour la question 4- d'une file d'attente dans le fichier correspondant
+void ajout_file_fich(Liste *liste,float t)      //Ajoute les données utiles pour la question 4- d'une file d'attente dans le fichier correspondant
 {
     FILE *fic;
     Data data;
-    fic = fopen(NOM_FIC2, "a");
+    fic = fopen(DAT, "a");
     Element *courant;
     courant = liste->premier;
     while (courant->suiv != NULL)       //On récupère la taille de la file et l'heure
@@ -152,17 +158,17 @@ void ajout_file_fich(Liste *liste)      //Ajoute les données utiles pour la que
         courant = courant->suiv;
     }
     data.taille = courant->voiture.indice;
-    data.temps = courant->voiture.ha;
+    data.temps = t;
     afficher_Data(data);
     fwrite(&data, sizeof(Data), 1, fic);
     fclose(fic);
 }
 
-void ajout_file_fichtxt(Liste *liste)      //Ajoute les données utiles pour la question 4- d'une file d'attente dans le fichier correspondant
+void ajout_file_fichtxt(Liste *liste, float t)      //Ajoute les données utiles pour la question 4- d'une file d'attente dans le fichier correspondant
 {
     FILE *fic;
 
-    fic = fopen(NOM_FIC3, "a");
+    fic = fopen(TXT, "a");
     Element *courant;
     courant = liste->premier;
     while (courant->suiv != NULL)       //On récupère la taille de la file et l'heure
@@ -170,7 +176,7 @@ void ajout_file_fichtxt(Liste *liste)      //Ajoute les données utiles pour la 
         courant = courant->suiv;
     }
     float ind = courant->voiture.indice;
-    float temps = courant->voiture.ha;
+    float temps = t;
     fprintf(fic,"%f %f\n",temps,ind);
     fclose(fic);
 }
@@ -180,7 +186,7 @@ void ajout_file_fichtxt(Liste *liste)      //Ajoute les données utiles pour la 
 void ajout_voit_fich(Voiture voit)
 {
     FILE *fic;
-    fic = fopen(NOM_FIC, "a");
+    fic = fopen(BIN, "a");
     fwrite(&voit, sizeof(Voiture), 1, fic);
     fclose(fic);
 }
@@ -303,6 +309,13 @@ void tableau_de_bord(float T_simu, float tps_rep_moy, float max, float moyenne){
     fclose(fichier);
 }
 
+void suppr_fich(void){
+    remove("/home/lucasmaisonnave/CLionProjects/projetC/cmake-build-debug/data_file.dat");
+    remove("/home/lucasmaisonnave/CLionProjects/projetC/cmake-build-debug/data_file.txt");
+    remove("/home/lucasmaisonnave/CLionProjects/projetC/cmake-build-debug/data_voit.bin");
+    remove("/home/lucasmaisonnave/CLionProjects/projetC/cmake-build-debug/tableau_de_bord.txt");
+}
+
 
 // SIMULATION ----------------------------------------------------------------------------------------------------------
 
@@ -335,8 +348,8 @@ int simulation(float temps_simul)
                 timer += (float)alpha;
                 avancer(File_voitures,timer);
                 ajout_voiture(timer, File_voitures, tab_aleatoire);
-                ajout_file_fich(File_voitures);
-                ajout_file_fichtxt(File_voitures);
+                ajout_file_fich(File_voitures,timer);
+                ajout_file_fichtxt(File_voitures,timer);
                 timer_red = timer_reduit(timer);
             }
             afficher_liste(File_voitures);
@@ -354,8 +367,8 @@ int simulation(float temps_simul)
             {
                 timer += (float)T - timer_red;
                 ajout_voiture(timer, File_voitures, tab_aleatoire);
-                ajout_file_fich(File_voitures);
-                ajout_file_fichtxt(File_voitures);
+                ajout_file_fich(File_voitures,timer);
+                ajout_file_fichtxt(File_voitures,timer);
 
             }
             afficher_liste(File_voitures);
