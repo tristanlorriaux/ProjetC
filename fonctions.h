@@ -16,14 +16,14 @@
 #include <errno.h>
 
 
-#define lambda 0.28
-#define alpha 1.8
+#define lambda 0.2
+#define alpha 1.5
 #define T 60.0                      // période cycle
 #define Tv  30.0                     // période feu vert
-#define N 150                       //Taille tableau des Heures d'arrivées
-#define NOM_FIC   "data_voit.bin"   //Fichier pour Q3
-#define NOM_FIC2   "data_file.dat"  //Ficahier pour Q4
-#define NOM_FIC3   "data_file.txt"  //Fichier pour Q5
+#define N 841                       //Taille tableau des Heures d'arrivées
+#define BIN   "data_voit.bin"   //Fichier pour Q3
+#define DAT   "data_file.dat"  //Ficahier pour Q4
+#define TXT   "data_file.txt"  //Fichier pour Q5
 
 
 typedef struct{
@@ -71,5 +71,7 @@ int simulation(float temps_simul);
 float tps_rep_moy(void);
 float max_file(void);
 float moyenne_file(void);
-void ajout_file_fichtxt(Liste *liste);
+void ajout_file_fich(Liste *liste, float t);
+void ajout_file_fichtxt(Liste *liste,float t);
 void tableau_de_bord(float T_simu, float tps_rep_moy, float max, float moyenne);
+void suppr_fich(void);
