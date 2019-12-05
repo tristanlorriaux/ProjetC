@@ -1,11 +1,6 @@
 #include "fonctions.h"
 
 
-#define lambda 0.2
-#define alpha 1.5
-#define T 60                        // période cycle
-#define Tv  30                      // période feu vert
-#define N 150                       //Taille tableau des Heures d'arrivées
 
 // Partie initialisation----------------------------------------------------------------------------------------------------------
 
@@ -28,7 +23,7 @@ Liste *creation()
 }
 
 void ajout_voit_fich(Voiture voit);
-int indice_tab(double tab[N]);
+
 
 //Partie aléatoire -----------------------------------------------------------------------------------------------------
 
@@ -60,17 +55,16 @@ float moyenne_file(void)
 {
     FILE *fichier;
     Data data;
-    float moyenne;
+    float moyenne ;
     float somme = 0;
     float compteur = 0;
-    fichier = fopen(NOM_FIC2, "r+");
+    fichier = fopen(NOM_FIC2, "r");
     while (fread(&data, sizeof(Data), 1, fichier) == 1) {
-
         somme = somme + data.taille;
         compteur++;
     }
     moyenne = somme / compteur;
-    printf("La taille moyenne d'une file d'attente vaut %fs\n", moyenne);
+    printf("La taille moyenne d'une file d'attente vaut %f\n", moyenne);
     fclose(fichier);
     return moyenne;
 }
@@ -80,10 +74,11 @@ float max_file(void)
     FILE *fichier;
     Data data;
     float max = 0;
-    fichier = fopen(NOM_FIC2,"r+");
-    while (fread(&data, sizeof(Data), 1, fichier) == 1)
-        if (data.taille > max)
-            max=data.taille;
+    fichier = fopen(NOM_FIC2,"r");
+    while ((fread(&data, sizeof(Data), 1, fichier) == 1) && (data.taille > max))
+    {
+        max = data.taille;
+    }
     printf("La taille maximale vaut %f\n", max);
     fclose(fichier);
     return max;
@@ -95,7 +90,7 @@ float tps_rep_moy(void)
     Voiture voiture;
     float somme = 0;
     float cmpt = 0;
-    fichier = fopen(NOM_FIC,"r+");
+    fichier = fopen(NOM_FIC,"r");
     while (fread(&voiture, sizeof(Voiture), 1, fichier) == 1)
     {
         somme += voiture.t_passage + voiture.t_att;
@@ -289,14 +284,14 @@ float timer_reduit(float timer)     // permet de travailler toujours dans l'inte
 {
     float new_timer = timer;
     while (new_timer >= T)
-        new_timer -= T;
+        new_timer -= (float)T;
     return new_timer;
 }
 
 void tableau_de_bord(float T_simu, float tps_rep_moy, float max, float moyenne){
     FILE *fichier;
     fichier = fopen("tableau_de_bord.txt","w");
-    fprintf(fichier,"                         TABLEAU DE BORD\n\n");
+    fprintf(fichier,"                                          TABLEAU DE BORD\n\n");
     fprintf(fichier,"Valeurs initiales : temps de simulation : %f\n", T_simu);
     fprintf(fichier,"                    lambda : %f\n", lambda);
     fprintf(fichier,"                    Tv : %f\n", Tv);
@@ -305,6 +300,7 @@ void tableau_de_bord(float T_simu, float tps_rep_moy, float max, float moyenne){
     fprintf(fichier,"Résultats : Taille max : %f\n", max);
     fprintf(fichier,"            Taille moyenne : %f\n", moyenne);
     fprintf(fichier,"            Temps de réponse moyen : %f\n", tps_rep_moy);
+    fclose(fichier);
 }
 
 
@@ -330,7 +326,7 @@ int simulation(float temps_simul)
             if((File_voitures->premier)->suiv == NULL)
             {                 //Attention au cas où le feu est vert et qu'il n'y a pas de voiture dans la file
                 printf("V et vide 1");
-                timer += Tv-timer_red;
+                timer += (float)Tv-timer_red;
                 ajout_voiture(timer,File_poubelle,tab_aleatoire);
                 timer_red = timer_reduit(timer);
             }
@@ -351,12 +347,12 @@ int simulation(float temps_simul)
             if((File_voitures->premier)->suiv == NULL && (timer_red < Tv))
             {
                 printf("V et vide 2");
-                timer += Tv-timer_red;
+                timer += (float)Tv-timer_red;
                 ajout_voiture(timer,File_poubelle,tab_aleatoire);
             }
             else
             {
-                timer += T - timer_red;
+                timer += (float)T - timer_red;
                 ajout_voiture(timer, File_voitures, tab_aleatoire);
                 ajout_file_fich(File_voitures);
                 ajout_file_fichtxt(File_voitures);
